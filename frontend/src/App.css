@@ -1,0 +1,169 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+.App.light{
+  background-color: #FFFFFF;
+}
+
+.App.dark{
+  background-color: #2B2B2B;
+}
+
+.App {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  justify-content: center;
+}
+
+.size-indicator {
+  width: calc(100vw / 30);
+  height: calc(100vw / 30);
+  margin: calc(100vw / 100);
+}
+
+.Indicator {
+  border: 1px solid #ffffff;
+  border-radius: 50%;
+}
+
+.IndicatorContainer {
+  display: flex;
+  justify-content: center;
+  padding: calc(100vw / 200);
+  background-color: #2B2B2B;
+}
+
+.RowInfo {
+  display: flex;
+  justify-content: space-around;
+  font-size: calc(100vw / 20);
+  font-weight: bold;
+}
+
+.RowInfo__value.light {
+  color: black;
+}
+
+.RowInfo__value.dark {
+  color: yellow;
+}
+
+.RowInfo__value {
+  font-weight: bold;
+  width: 50%;
+}
+
+.RowInfo__label.light {
+  color: black;
+}
+
+.RowInfo__label.dark {
+  color: #00ffff;
+}
+
+.RowInfo__label {
+  font-weight: bold;
+  width: calc(100vw / 4);
+  padding: 0 20px;
+}
+
+.Ad {
+  font-size: calc(100vw / 20);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh / 15);
+  padding: 0 calc(100vw / 50) calc(100vw / 50) calc(100vw / 50);
+}
+
+.Ad.light {
+  color: black;
+}
+
+.Ad.dark {
+  color: greenyellow;
+}
+
+.Internet.red {
+  fill: #ff2222;
+}
+
+.Internet.grey {
+  fill: grey;
+}
+
+.Internet.green {
+  fill: #00ff00;
+}
+
+.Internet.green {
+  fill: #00ff00;
+}
+
+.Wifi.red {
+  fill: #ff2222;
+}
+
+.Wifi.grey {
+  fill: grey;
+}
+
+.Wifi.green {
+  fill: #00ff00;
+}
+
+.Indicator.red {
+  background-color: #ff2222;
+}
+
+.Indicator.green {
+  background-color: #00ff00;
+}
+
+.Indicator.grey {
+  background-color: grey;
+}
+
+.light-color {
+  color: black;
+}
+
+.MessageBox.light {
+  color: black;
+  border: 2px dashed grey;
+}
+
+.dark-color{
+  color: greenyellow;
+}
+
+.MessageBox.dark {
+  color: greenyellow;
+  border: 1px dashed #90EE9055;
+}
+
+.MessageBox {
+  font-size: calc(100vw / 10);
+  padding: calc(100vh / 100);
+  margin: calc(100vh / 50);
+  position: relative;
+  flex: 1 0 auto;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  font-weight: bold;
+}
+
+.logo {
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  width: calc(100vw / 7);
+}
+
+.MessageBox .message {
+  align-self: center;
+}
