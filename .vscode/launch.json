@@ -5,8 +5,9 @@
             "type": "debugpy",
             "request": "launch",
             "module": "uvicorn",
+            "cwd": "${workspaceFolder}/backend",
             "args": [
-                "backend.main:app",
+                "main:app",
                 "--reload",
                 "--port",
                 "8888"
