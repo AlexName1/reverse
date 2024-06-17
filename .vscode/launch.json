@@ -1,6 +1,19 @@
 {
     "configurations": [
         {
+            "name": "Python Debugger: FastAPI",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "backend.main:app",
+                "--reload",
+                "--port",
+                "8888"
+            ],
+            "jinja": true
+        },
+        {
             "type": "pwa-msedge",
             "name": "Launch Microsoft Edge",
             "request": "launch",
