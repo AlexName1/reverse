@@ -1,13 +1,12 @@
 "use strict";
 
 import './App.css';
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import Internet from "./icons/Internet.jsx";
 import Wifi from "./icons/Wifi.jsx";
 
 
 let elem = document.documentElement;
-let baseUrl = 'http://127.0.0.1:8888';
 
 /* View in fullscreen */
 function openFullscreen() {
@@ -24,30 +23,6 @@ document.onload = function (e) {
     openFullscreen();
 }
 
-function useInterval(callback, delay, firstOff = false) {
-    const savedCallback = useRef();
-
-    // Запомним последний калбэк
-    useEffect(() => {
-        savedCallback.current = callback
-    }, [callback]);
-
-    // Установим интервал
-    useEffect(() => {
-        function tick() {
-            savedCallback.current();
-        }
-
-        if (firstOff === true) {
-            setTimeout(tick, 1000)
-        }
-
-        if (delay !== null) {
-            let id = setInterval(tick, delay);
-            return () => clearInterval(id);
-        }
-    }, [delay]);
-}
 
 function RowInfo({label, leftValue, rightValue, theme, sections = 2,}) {
     return (<div className="RowInfo">
@@ -82,12 +57,12 @@ function RowContainer({counters, fuelOrder, theme, components}) {
         price: 0,
         quantity: 0,
     }
-    console.log(fuelOrderPair);
+    // console.log(fuelOrderPair);
 
     return (<>
         {fuelOrderPair.map((item, i) => {
-            console.log("Entered");
-            console.log(counters);
+            // console.log("Entered");
+            // console.log(counters);
 
             let leftCounter = blankCounter;
             let rightCounter = blankCounter;
@@ -177,45 +152,13 @@ function Indicator({color, component, initialColor = 'grey'}) {
 }
 
 function IndicatorContainer() {
-    let [lanIndicatorStatusColor, setLanIndicatorStatusColor] = useState('red');
-    let [serverIndicatorStatusColor, setServerIndicatorStatusColor] = useState('red');
-
-    function onShutdown() {
-        fetch(`${baseUrl}/shutdown/`, {method: 'POST'})
-            .then(response => response.json())
-            .then((result) => {
-                console.log('shutdown')
-            });
-    }
-
-    useInterval(() => {
-        if (navigator.onLine) {
-            setLanIndicatorStatusColor('green');
-        } else {
-            setLanIndicatorStatusColor('red');
-        }
-    }, 5000, true);
-
-    useInterval(() => {
-
-        const myInit = {
-            method: 'HEAD',
-        };
-        const url = 'https://lk.terminal.gs/terminal_api/ping_service/'
-        fetch(url, myInit).then(response => {
-            if (response.ok) {
-                setServerIndicatorStatusColor('green');
-            } else {
-                setServerIndicatorStatusColor('red');
-            }
-        });
-
-    }, 20000, true);
+    let [lanIndicatorStatusColor, setLanIndicatorStatusColor] = useState('green');
+    let [serverIndicatorStatusColor, setServerIndicatorStatusColor] = useState('green');
 
     const internet = <Internet className={`Internet size-indicator ` + serverIndicatorStatusColor}/>
     const wifi = <Wifi className={"Wifi size-indicator " + lanIndicatorStatusColor}/>
 
-    return (<div className="IndicatorContainer" onClick={() => onShutdown()}>
+    return (<div className="IndicatorContainer" >
         <Indicator key="1" color={serverIndicatorStatusColor} component={internet}/>
         <Indicator key="2" color={lanIndicatorStatusColor} component={wifi}/>
     </div>)
@@ -227,142 +170,51 @@ function App() {
     const [page, setPage] = useState({page: 'home', data: {}})
     const [ad, setAd] = useState(undefined)
     const [message, setMessage] = useState(undefined)
-    const [theme, setTheme] = useState('light')
+    const [theme, setTheme] = useState('dark')
     const [components, setComponents] = useState([])
     const [fontRatio, setFontRatio] = useState(1)
     const [paddings, setPaddings] = useState([0, 0, 0, 0])
 
-    useInterval(() => {
-        fetch(`${baseUrl}/get-fuel-order/`, {method: 'POST'})
-            .then(response => response.json())
-            .then((result) => {
-                setFuelOrder(result)
-            })
-            .then((data) => {
-                console.log(data);
-            })
-            .catch(rejected => {
-                console.log(rejected);
-            });
-    }, 10000, true)
+    const [socket, setSocket] = useState(null);
 
-    useInterval(() => {
-        fetch(`${baseUrl}/get-counters/`, {method: 'POST'})
-            .then(response => response.json())
-            .then((result) => {
-                setCounters(result)
-            })
-            .then((data) => {
-                console.log(data);
-            })
-            .catch(rejected => {
-                console.log(rejected);
-            });
-    }, 100, true)
+    useEffect(() => {
+        const newSocket = new WebSocket("ws://127.0.0.1:8888/ws");
+        setSocket(newSocket);
+        return () => newSocket.close();
+    }, []);
 
-    useInterval(() => {
-        fetch(`${baseUrl}/get-page/`, {method: 'POST'})
-            .then(response => response.json())
-            .then((result) => {
-                setPage(result)
-            })
-            .then((data) => {
-                console.log(data);
-            })
-            .catch(rejected => {
-                console.log(rejected);
-            });
-    }, 500, true)
+    useEffect(() => {
+        if (!socket) return;
 
-    useInterval(() => {
-        let messageResult = ''
-        fetch(`${baseUrl}/get-message/`, {method: 'POST'})
-            .then(response => response.json())
-            .then((result) => {
-                messageResult = result
-            })
-            .then((data) => {
-                console.log(data);
-            })
-            .then((_) => {
-                fetch(`${baseUrl}/get-font-ratio/`, {method: 'POST'})
-                    .then(response => response.json())
-                    .then((result) => {
-                        setFontRatio(result);
-                        setMessage(messageResult);
-                        console.log(result);
-                    })
-                    .then((data) => {
-                        console.log(data);
-                    })
-                    .catch(rejected => {
-                        console.log(rejected);
-                    });
-            })
-            .catch(rejected => {
-                console.log(rejected);
-            });
-    }, 800, true)
+        socket.onopen = function () {
+            console.log("WebSocket connected");
+            const eventData = "Event data";
+            socket.send(eventData);
+        };
 
-    useInterval(() => {
-        fetch(`${baseUrl}/get-ad/`, {method: 'POST'})
-            .then(response => response.json())
-            .then((result) => {
-                setAd(result)
-            })
-            .then((data) => {
-                console.log(data);
-            })
-            .catch(rejected => {
-                console.log(rejected);
-            });
-    }, 10000, true)
+        socket.onmessage = function (event) {
+            const response = JSON.parse(event.data);
+            setFuelOrder(response.data.fuel_order)
+            setCounters(response.data.counters)
+            setPage(response.page)
+            setAd(response.data.ad)
+            setTheme(response.data.theme)
+            setComponents(response.data.components)
+            setPaddings(response.data.paddings)
+        };
 
+        socket.onclose = function () {
+            console.log("WebSocket closed");
+        };
 
-    useInterval(() => {
-        fetch(`${baseUrl}/get-theme/`, {method: 'POST'})
-            .then(response => response.json())
-            .then((result) => {
-                setTheme(result)
-                console.log(result);
-            })
-            .then((data) => {
-                console.log(data);
-            })
-            .catch(rejected => {
-                console.log(rejected);
-            });
-    }, 10000, true)
+        socket.onerror = () => {
+            console.log("WebSocket error");
+          };
 
-    useInterval(() => {
-        fetch(`${baseUrl}/get-components/`, {method: 'POST'})
-            .then(response => response.json())
-            .then((result) => {
-                setComponents(result)
-                console.log(result);
-            })
-            .then((data) => {
-                console.log(data);
-            })
-            .catch(rejected => {
-                console.log(rejected);
-            });
-    }, 10000, true)
-
-    useInterval(() => {
-        fetch(`${baseUrl}/get-paddings/`, {method: 'POST'})
-            .then(response => response.json())
-            .then((result) => {
-                setPaddings(result)
-                console.log(result);
-            })
-            .then((data) => {
-                console.log(data);
-            })
-            .catch(rejected => {
-                console.log(rejected);
-            });
-    }, 10000, true)
+        return () => {
+            socket.close();
+        };
+    }, [socket]);
 
     let paddingTop = 0;
     let paddingRight = 0;

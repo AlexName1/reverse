@@ -4,11 +4,12 @@ version = "0.1.0"
 description = ""
 authors = ["AlexName1 <at146@ya.ru>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.11"
-fastapi = "^0.111.0"
-
+python = "^3.7"
+fastapi = "0.103.2"
+uvicorn = {version = "0.22.0", extras = ["standard"]}
 
 [build-system]
 requires = ["poetry-core"]
