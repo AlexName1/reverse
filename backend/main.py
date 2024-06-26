@@ -1,10 +1,11 @@
 import os
 from typing import List, Optional
 
+import asyncio
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-import random
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 
 from schemas import lcd_schemas
@@ -35,28 +36,21 @@ app.add_middleware(
 )
 
 
-home_page = lcd_schemas.Page(page="home", data={})
+lcd_data = lcd_schemas.DataModel()
 
+# debug
 
-class DataModel:
-    data: lcd_schemas.ScreenData
-    page: lcd_schemas.Page = home_page
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.data = lcd_schemas.ScreenData(
-            fuel_order=[],
-            counters={},
-            ad=None,
-            message=None,
-            theme="light",
-            components=[],
-            paddings=[],
-            font_ratio=1,
-        )
-
-
-lcd_data: DataModel = DataModel()
+# fuel_counter = lcd_schemas.FuelCounter(fuel_sleeve=1)
+# lcd_data.data = lcd_schemas.ScreenData(
+#     fuel_order=[92, 95],
+#     counters={92 : fuel_counter, 95: fuel_counter},
+#     ad=None,
+#     message=None,
+#     theme="dark",
+#     components=['L', 'P', 'S'],
+#     paddings=[],
+#     font_ratio=1,
+# )
 
 
 class Message(BaseModel):
@@ -81,52 +75,6 @@ class Theme(BaseModel):
 
 class Components(BaseModel):
     components: List[str]
-
-
-# getters
-@app.post("/get-theme/")
-async def get_theme():
-    return lcd_data.data.theme
-
-
-@app.post("/get-components/")
-async def get_components():
-    return lcd_data.data.components
-
-
-@app.post("/get-paddings/")
-async def get_paddings():
-    return lcd_data.data.paddings
-
-
-@app.post("/get-fuel-order/")
-async def get_fuel_order():
-    return lcd_data.data.fuel_order
-
-
-@app.post("/get-counters/")
-async def get_counters():
-    return lcd_data.data.counters
-
-
-@app.post("/get-message/")
-async def get_message():
-    return lcd_data.data.message
-
-
-@app.post("/get-page/")
-async def get_page():
-    return lcd_data.page
-
-
-@app.post("/get-ad/")
-async def get_ad():
-    return lcd_data.data.ad
-
-
-@app.post("/get-font-ratio/")
-async def get_font_ratio():
-    return lcd_data.data.font_ratio
 
 
 # setters
@@ -196,18 +144,24 @@ async def shutdown():
     return True
 
 
+@app.get("/", response_class=RedirectResponse)
+async def redirect_fastapi():
+    return "/public/index.html"
+
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    print('a new websocket to create.')
+    print("a new websocket to create.")
     await websocket.accept()
     while True:
         try:
             # Wait for any message from the client
             await websocket.receive_text()
-            # Send message to the client
-            resp = {'value': random.uniform(0, 1)}
-            await websocket.send_json(resp)
+            while True:
+                # Send message to the client
+                await websocket.send_json(lcd_data.model_dump())
+                await asyncio.sleep(.1)
         except Exception as e:
-            print('error:', e)
+            print("error:", e)
             break
-    print('Bye..')
+    print("Bye..")

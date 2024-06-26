@@ -1,6 +1,28 @@
 {
     "configurations": [
         {
+            "name": "Launch localhost",
+            "firefoxExecutable": "/home/alex/Downloads/firefox-128.0b7/firefox/firefox",
+            "type": "firefox",
+            "request": "launch",
+            "reAttach": true,
+            "url": "http://localhost:3000/index.html",
+            "webRoot": "${workspaceFolder}/frontend",
+            "pathMappings": [
+                {
+                    "url": "http://localhost:3000/home/alex_linux/my_code/front/websocket/frontend/src",
+                    "path": "${workspaceFolder}/frontend/src"
+                }
+            ],
+        },
+        {
+            "command": "npm start",
+            "name": "Run npm start",
+            "request": "launch",
+            "type": "node-terminal",
+            "cwd": "${workspaceFolder}/frontend"
+        },
+        {
             "name": "Python Debugger: FastAPI",
             "type": "debugpy",
             "request": "launch",
@@ -12,7 +34,8 @@
                 "--port",
                 "8888"
             ],
-            "jinja": true
+            "jinja": true,
+            "justMyCode": false
         },
         {
             "type": "pwa-msedge",

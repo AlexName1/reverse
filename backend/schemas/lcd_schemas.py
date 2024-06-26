@@ -12,16 +12,21 @@ class FuelCounter(BaseModel):
 
 
 class ScreenData(BaseModel):
-    fuel_order: List[int]
-    counters: Dict[int, FuelCounter]
-    ad: Optional[str]
-    message: Optional[str]
-    theme: str
-    components: List[str]
-    paddings: List[int]
-    font_ratio: float
+    fuel_order: Optional[List[int]] = []
+    counters: Dict[int, FuelCounter] = {}
+    ad: Optional[str] = None
+    message: Optional[str] = None
+    theme: str = "dark"
+    components: List[str] = []
+    paddings: List[int] = []
+    font_ratio: float = 1
 
 
 class Page(BaseModel):
-    page: str
-    data: dict
+    page: str = "home"
+    data: dict = {}
+
+
+class DataModel(BaseModel):
+    data: ScreenData = ScreenData()
+    page: Page = Page()
